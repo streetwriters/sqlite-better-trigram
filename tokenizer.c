@@ -10,7 +10,6 @@
 **
 */
 
-#include <sqlite3ext.h>
 #include <stdint.h>
 #include <string.h>
 
@@ -112,7 +111,7 @@ static void tokenize(const char *pText, int nText, int foldCase,
 
     if (i == 3) {
       int result = xToken(pCtx, 0, aBuf, zOut - aBuf, aStart[0], start);
-      if (result != SQLITE_OK)
+      if (result != 0)
         break;
 
       // remove first UTF-8 character from aBuf
@@ -136,7 +135,7 @@ static void tokenize(const char *pText, int nText, int foldCase,
       // but make sure we aren't at the end of a word
       if (!isPartial && i && i < 3) {
         int result = xToken(pCtx, 0, aBuf, zOut - aBuf, aStart[0], start);
-        if (result != SQLITE_OK)
+        if (result != 0)
           break;
       }
 

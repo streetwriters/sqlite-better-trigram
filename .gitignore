@@ -1,2 +1,3 @@
 *.so
-fts5_unicode2.c
+deps/
+cache/

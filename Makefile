@@ -1,6 +1,9 @@
 EXT = .so
-CFLAGS ?= -Os -Wall -Wextra -Werror -Wno-error=type-limits
-SQLITE_VERSION = version-3.46.1
+SQLITE_VERSION ?= version-3.46.1
+CFLAGS ?= -I deps/$(SQLITE_VERSION)/ext/fts5 -Os -Wall -Wextra -Werror -Wno-error=type-limits
+
+SQLITE_TARBALL_URL = https://www.sqlite.org/src/tarball/sqlite.tar.gz?r=${SQLITE_VERSION}
+SQLITE_SRC = deps/$(SQLITE_VERSION)/src
 
 ifeq ($(OS),Windows_NT)
 	EXT = .dll
@@ -13,31 +16,31 @@ endif
 
 .PHONY: all clean test
 
-all: fts5_unicode2.c better-trigram$(EXT)
+all: $(SQLITE_SRC)/sqlite3ext.h better-trigram$(EXT)
 
 clean:
-	rm -r fts5_unicode2.c
+	rm -rf deps
 	rm -f better-trigram$(EXT)
 	rm -rf better-trigram$(EXT).dSYM
 	rm -rf fts5$(EXT)
 
-fts5_unicode2.c:
-	wget -q https://raw.githubusercontent.com/sqlite/sqlite/refs/tags/$(SQLITE_VERSION)/ext/fts5/fts5_unicode2.c
+$(SQLITE_SRC)/sqlite3ext.h:
+	mkdir -p deps/$(SQLITE_VERSION)
+	curl -LsS $(SQLITE_TARBALL_URL) | tar -xzf - -C deps/$(SQLITE_VERSION)/ --strip-components=1
 
 better-trigram$(EXT): better-trigram.c
 	$(CC) $(CFLAGS) -g -shared -fPIC -o $@ $<
 
 fts5$(EXT): SHELL := /bin/bash -e
-fts5$(EXT):
-	dir=/tmp/$$(cat /dev/urandom | tr -cd 'a-f0-9' | head -c 32); \
+fts5$(EXT): $(SQLITE_SRC)/sqlite3ext.h
+	dir=deps/$(SQLITE_VERSION) \
 	cwd=$$(pwd); \
-	git clone --depth=1 --branch=$(SQLITE_VERSION) https://github.com/sqlite/sqlite.git $$dir; \
 	lemon $$dir/ext/fts5/fts5parse.y; \
 	cd $$dir/ext/fts5; \
-	tclsh $$dir/ext/fts5/tool/mkfts5c.tcl; \
+	tclsh $$cwd/$$dir/ext/fts5/tool/mkfts5c.tcl; \
 	cd $$cwd; \
-	$(CC) -DSQLITE_TEST -g -shared -fPIC -o fts5.so $$dir/ext/fts5/fts5.c; \
+	$(CC) -DSQLITE_TEST -I deps/$(SQLITE_VERSION) -g -shared -fPIC -o fts5.so $$dir/ext/fts5/fts5.c; \
 	rm -rf $$dir
 
-test: fts5$(EXT) fts5_unicode2.c better-trigram$(EXT)
+test: fts5$(EXT) better-trigram$(EXT)
 	bun test
