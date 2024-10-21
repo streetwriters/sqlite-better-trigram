@@ -36,7 +36,25 @@ Refer to [FTS5 documentation for the Trigram tokenizer](https://sqlite.org/fts5.
 
 ## Performance
 
-I haven't run any benchmarks but there should be 0 noticeable difference in both tokenizers. In fact, `better-trigram` may be a little faster but don't take my word for it. Run your own benchmarks and see. If you notice a significant performance issue, feel free to open an issue and I'll take a look. Or, you know, wait till I run some benchmarks.
+`better-trigram` is significantly faster than `trigram`. Here are the benchmarks:
+
+```
+Text length: 289091
+clk: ~4.09 GHz
+cpu: AMD Ryzen 5 PRO 5650U with Radeon Graphics
+runtime: bun 1.1.31 (x64-linux)
+
+benchmark              avg (min … max) p75   p99    (min … top 1%)
+-------------------------------------- -------------------------------
+better-trigram            6.37 ms/iter   6.86 ms   7.31 ms ▂▅▃▂▂▃▄▇█▄▂
+trigram                  10.21 ms/iter  11.23 ms  12.75 ms █▄▄▄▃▅▅▇▄▂▂
+
+summary
+  better-trigram
+   1.6x faster than trigram
+```
+
+To reproduce on your own machine, run `bun bench.ts`.
 
 ## Contributing
 
