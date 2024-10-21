@@ -11,6 +11,7 @@ else
 	UNAME_S := $(shell uname -s)
 	ifeq ($(UNAME_S),Darwin)
 		EXT = .dylib
+		CLAGS = $(CFLAGS) -lsqlite3
 	endif
 endif
 
