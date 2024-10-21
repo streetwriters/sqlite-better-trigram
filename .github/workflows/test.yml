@@ -38,5 +38,7 @@ jobs:
       - name: Install bun
         uses: oven-sh/setup-bun@v2
 
+      - uses: ilammy/msvc-dev-cmd@v1
+
       - name: Run tests
         run: nmake /f Makefile.vc test
