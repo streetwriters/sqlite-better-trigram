@@ -42,7 +42,7 @@ fts5$(EXT): $(SQLITE_SRC)/sqlite3ext.h
 	cd $$dir/ext/fts5; \
 	tclsh $$cwd/$$dir/ext/fts5/tool/mkfts5c.tcl; \
 	cd $$cwd; \
-	$(CC) $(CONDITIONAL_CFLAGS) -DSQLITE_TEST -g -shared -fPIC $$dir/ext/fts5/fts5.c -o $@ $<; \
+	$(CC) $(CONDITIONAL_CFLAGS) -DSQLITE_TEST -g -shared -fPIC $$dir/ext/fts5/fts5.c -o $@; \
 
 test: fts5$(EXT) better-trigram$(EXT)
 	bun test
