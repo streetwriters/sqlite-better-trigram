@@ -10,13 +10,28 @@
 **
 */
 
-#include "sqlite3ext.h"
 #include "tokenizer.c"
 #include <stdio.h>
-SQLITE_EXTENSION_INIT1
 #include <string.h>
 
+#ifdef SQLITE_OMIT_LOAD_EXTENSION
+#define SQLITE_OMIT_LOAD_EXTENSION_PREINCLUDE
+#endif
+
+#include "sqlite3ext.h"
+SQLITE_EXTENSION_INIT1
+
+#if defined(SQLITE_OMIT_LOAD_EXTENSION) &&                                     \
+    !defined(SQLITE_OMIT_LOAD_EXTENSION_PREINCLUDE)
+/* note: if you are on macOS - do not use included SQLite sqlite3ext.h */
+#error "The sqlite3ext.h header defines SQLITE_OMIT_LOAD_EXTENSION"
+#endif
+
 #define UNUSED_PARAM(x) (void)(x)
+
+#ifndef SQLITE_PRIVATE
+#define SQLITE_PRIVATE static
+#endif
 
 static fts5_api *fts5_api_from_db(sqlite3 *db) {
   fts5_api *pRet = 0;
@@ -107,7 +122,7 @@ static int fts5BetterTrigramTokenize(Fts5Tokenizer *pTokenizer, void *pCtx,
   return SQLITE_OK;
 }
 
-int RegisterTrigramTokenizer(sqlite3 *db) {
+static int fts5BetterTrigramInit(sqlite3 *db) {
   fts5_api *ftsApi;
 
   fts5_tokenizer tokenizer = {fts5BetterTrigramCreate, fts5BetterTrigramDelete,
@@ -128,9 +143,19 @@ int RegisterTrigramTokenizer(sqlite3 *db) {
 #ifdef _WIN32
 __declspec(dllexport)
 #endif
-    int sqlite3_bettertrigram_init(sqlite3 *db, char **error, const sqlite3_api_routines *api) {
+
+#ifndef SQLITE_CORE
+#ifdef _WIN32
+__declspec(dllexport)
+#endif
+int sqlite3_bettertrigram_init(sqlite3 *db, char **error, const sqlite3_api_routines *api) {
   SQLITE_EXTENSION_INIT2(api);
   UNUSED_PARAM(error);
 
-  return RegisterTrigramTokenizer(db);
+  return fts5BetterTrigramInit(db);
 }
+#else
+SQLITE_PRIVATE int sqlite3Fts5BetterTrigramInit(sqlite3 *db) {
+  return fts5BetterTrigramInit(db);
+}
+#endif
