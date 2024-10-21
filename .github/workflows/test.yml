@@ -20,8 +20,8 @@ jobs:
 
       - name: Install dependencies
         run: |
-          brew install lemon
-          brew install tcl-tk
+          sudo apt install lemon
+          sudo apt install tcl
           curl -fsSL https://bun.sh/install | bash
 
       - name: Run tests
