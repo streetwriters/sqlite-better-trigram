@@ -5,13 +5,15 @@ CFLAGS ?= -I deps/$(SQLITE_VERSION)/ext/fts5 -Os -Wall -Wextra -Werror -Wno-erro
 SQLITE_TARBALL_URL = https://www.sqlite.org/src/tarball/sqlite.tar.gz?r=${SQLITE_VERSION}
 SQLITE_SRC = deps/$(SQLITE_VERSION)/src
 
+CONDITIONAL_CFLAGS =
+
 ifeq ($(OS),Windows_NT)
 	EXT = .dll
 else
 	UNAME_S := $(shell uname -s)
 	ifeq ($(UNAME_S),Darwin)
 		EXT = .dylib
-		CLAGS = $(CFLAGS) -lsqlite3
+		CONDITIONAL_CFLAGS = -lsqlite3
 	endif
 endif
 
@@ -30,7 +32,7 @@ $(SQLITE_SRC)/sqlite3ext.h:
 	curl -LsS $(SQLITE_TARBALL_URL) | tar -xzf - -C deps/$(SQLITE_VERSION)/ --strip-components=1
 
 better-trigram$(EXT): better-trigram.c
-	$(CC) $(CFLAGS) -g -shared -fPIC -o $@ $<
+	$(CC) $(CFLAGS) $(CONDITIONAL_CFLAGS) -g -shared -fPIC -o $@ $<
 
 fts5$(EXT): SHELL := /bin/bash -e
 fts5$(EXT): $(SQLITE_SRC)/sqlite3ext.h
@@ -40,7 +42,7 @@ fts5$(EXT): $(SQLITE_SRC)/sqlite3ext.h
 	cd $$dir/ext/fts5; \
 	tclsh $$cwd/$$dir/ext/fts5/tool/mkfts5c.tcl; \
 	cd $$cwd; \
-	$(CC) -DSQLITE_TEST -g -shared -fPIC -o fts5$(EXT) $$dir/ext/fts5/fts5.c; \
+	$(CC) $(CONDITIONAL_CFLAGS) -DSQLITE_TEST -g -shared -fPIC $$dir/ext/fts5/fts5.c -o $@ $<; \
 
 test: fts5$(EXT) better-trigram$(EXT)
 	bun test
