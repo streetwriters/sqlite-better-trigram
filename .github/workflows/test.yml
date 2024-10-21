@@ -11,8 +11,8 @@ on:
       - "reopened"
 
 jobs:
-  test:
-    name: Test
+  test-linux:
+    name: Test Linux
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -27,3 +27,16 @@ jobs:
 
       - name: Run tests
         run: make test
+
+  test-windows:
+    name: Test Windows
+    runs-on: windows-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Install bun
+        uses: oven-sh/setup-bun@v2
+
+      - name: Run tests
+        run: nmake /f Makefile.vc test

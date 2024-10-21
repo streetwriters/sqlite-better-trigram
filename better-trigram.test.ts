@@ -14,10 +14,16 @@
 import { Database } from "bun:sqlite";
 import { test, describe, expect, afterAll, beforeAll } from "bun:test";
 
+const EXT =
+  process.platform === "win32"
+    ? ".dll"
+    : process.platform === "darwin"
+    ? ".dylib"
+    : ".so";
 function initDatabase() {
   const db = new Database(":memory:");
-  db.loadExtension("./fts5.so");
-  db.loadExtension("./better-trigram.so");
+  db.loadExtension(`./fts5${EXT}`);
+  db.loadExtension(`./better-trigram${EXT}`);
   return db;
 }
 

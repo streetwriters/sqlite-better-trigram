@@ -1,3 +1,9 @@
 *.so
 deps/
 cache/
+*.dll
+*.obj
+*.exp
+*.lib
+*.exe
+lempar.c
