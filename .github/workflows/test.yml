@@ -53,7 +53,7 @@ jobs:
       - name: Install dependencies
         run: |
           brew install lemon
-          brew install tcl
+          brew install tcl-tk
 
       - name: Install bun
         uses: oven-sh/setup-bun@v2
