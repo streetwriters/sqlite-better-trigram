@@ -20,9 +20,10 @@ jobs:
 
       - name: Install dependencies
         run: |
-          sudo apt install lemon
-          sudo apt install tcl
-          curl -fsSL https://bun.sh/install | bash
+          sudo apt install lemon tcl
+
+      - name: Install bun
+        uses: oven-sh/setup-bun@v2
 
       - name: Run tests
         run: make test
