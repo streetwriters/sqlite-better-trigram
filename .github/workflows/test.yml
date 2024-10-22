@@ -54,14 +54,12 @@ jobs:
         run: |
           brew install lemon
           brew install tcl-tk
-          brew reinstall sqlite
+          brew install sqlite@3.46.1
 
       - name: Install bun
         uses: oven-sh/setup-bun@v2
 
       - name: Run tests
         run: |
-          ls /opt/homebrew/bin/
-          SQLITE_VERSION=$(/opt/homebrew/bin/sqlite -version)
-          export SQLITE_LIB_PATH=/opt/homebrew/Cellar/sqlite/$SQLITE_VERSION/libsqlite.dylib
+          export SQLITE_LIB_PATH=/opt/homebrew/Cellar/sqlite/3.46.1/libsqlite.dylib
           make test
