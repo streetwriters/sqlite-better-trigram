@@ -61,6 +61,9 @@ jobs:
 
       - name: Run tests
         run: |
-          SQLITE_DIR=$(dirname $(which sqlite))
+          SQLITE_PATH=$(which sqlite)
+          echo $SQLITE_PATH
+          echo $(which sqlite)
+          SQLITE_DIR=$(dirname $SQLITE_PATH)
           export SQLITE_LIB_PATH=$SQLITE_DIR/libsqlite.dylib
           make test
