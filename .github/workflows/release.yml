@@ -10,7 +10,7 @@ jobs:
     runs-on: ubuntu-20.04
     steps:
       - uses: actions/checkout@v4
-      - run: make
+      - run: make loadable
       - uses: actions/upload-artifact@v4
         with:
           name: sqlite-better-trigram-linux-x86_64-extension
@@ -19,7 +19,7 @@ jobs:
     runs-on: macos-12
     steps:
       - uses: actions/checkout@v4
-      - run: make
+      - run: make loadable
       - uses: actions/upload-artifact@v4
         with:
           name: sqlite-better-trigram-macos-x86_64-extension
@@ -28,7 +28,7 @@ jobs:
     runs-on: macos-14
     steps:
       - uses: actions/checkout@v4
-      - run: make
+      - run: make loadable
       - uses: actions/upload-artifact@v4
         with:
           name: sqlite-better-trigram-macos-aarch64-extension
@@ -40,7 +40,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - uses: ilammy/msvc-dev-cmd@v1
-      - run: nmake /f Makefile.vc
+      - run: nmake /f Makefile.vc loadable
       - uses: actions/upload-artifact@v4
         with:
           name: sqlite-better-trigram-windows-x86_64-extension
@@ -74,7 +74,7 @@ jobs:
           make CC=${{ matrix.platforms.cc }} \
              AR=llvm-ar \
              RANLIB=llvm-ranlib \
-             STRIP=llvm-strip
+             STRIP=llvm-strip loadable
       - uses: actions/upload-artifact@v4
         with:
           name: sqlite-better-trigram-${{ matrix.platforms.name }}-extension
@@ -116,7 +116,7 @@ jobs:
         with:
           xcode-version: latest-stable
 
-      - run: make CFLAGS="-target ${{ matrix.platforms.target }} -isysroot $(xcrun -sdk ${{ matrix.platforms.sdk }} --show-sdk-path) -fembed-bitcode -DNDEBUG=1"
+      - run: make CFLAGS="-target ${{ matrix.platforms.target }} -isysroot $(xcrun -sdk ${{ matrix.platforms.sdk }} --show-sdk-path) -fembed-bitcode -DNDEBUG=1" loadable
       - uses: actions/upload-artifact@v4
         with:
           name: sqlite-better-trigram-${{ matrix.platforms.name }}-extension

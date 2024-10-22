@@ -19,7 +19,8 @@ TARGET_LOADABLE=$(prefix)\better-trigram$(EXT)
 TARGET_FTS5=$(prefix)\fts5$(EXT)
 TARGET_LEMON=$(prefix)\lemon.exe
 
-all: $(TARGET_LOADABLE)
+all: test loadable
+loadable: $(TARGET_LOADABLE)
 
 clean:
     if exist deps rmdir /S /Q deps
