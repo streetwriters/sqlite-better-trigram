@@ -61,10 +61,6 @@ jobs:
 
       - name: Run tests
         run: |
-          sqlite --version
-          SQLITE_PATH=$(which sqlite)
-          echo $SQLITE_PATH
-          echo $(which sqlite)
-          # SQLITE_DIR=$(dirname $SQLITE_PATH)
-          # export SQLITE_LIB_PATH=$SQLITE_DIR/libsqlite.dylib
-          # make test
+          SQLITE_VERSION=$(/opt/homebrew/bin/sqlite3 -version)
+          export SQLITE_LIB_PATH=/opt/homebrew/Cellar/sqlite/$SQLITE_VERSION/libsqlite.dylib
+          make test
