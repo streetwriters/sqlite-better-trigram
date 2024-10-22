@@ -1,11 +1,13 @@
 EXT = .so
 SQLITE_VERSION ?= version-3.46.1
-CFLAGS ?= -I deps/$(SQLITE_VERSION)/ext/fts5 -Os -Wall -Wextra -Werror -Wno-error=type-limits
 
 SQLITE_TARBALL_URL = https://www.sqlite.org/src/tarball/sqlite.tar.gz?r=${SQLITE_VERSION}
 SQLITE_SRC = deps/$(SQLITE_VERSION)/src
+SQLITE_AMALGAMATION_URL = https://sqlite.org/2024/sqlite-amalgamation-3460100.zip
+SQLITE_AMALGAMATION_PATH = deps/sqlite-amalgamation-3460100
 
-CONDITIONAL_CFLAGS =
+CFLAGS ?= -Ideps/$(SQLITE_VERSION)/ext/fts5 -I$(SQLITE_AMALGAMATION_PATH) -Os -Wall -Wextra
+CONDITIONAL_CFLAGS = -lm
 
 ifeq ($(OS),Windows_NT)
 	EXT = .dll
@@ -19,7 +21,7 @@ endif
 
 .PHONY: all clean test
 
-all: $(SQLITE_SRC)/sqlite3ext.h better-trigram$(EXT)
+all: better-trigram$(EXT)
 
 clean:
 	rm -rf deps
@@ -27,22 +29,29 @@ clean:
 	rm -rf better-trigram$(EXT).dSYM
 	rm -rf fts5$(EXT)
 
-$(SQLITE_SRC)/sqlite3ext.h:
+$(SQLITE_SRC):
 	mkdir -p deps/$(SQLITE_VERSION)
 	curl -LsS $(SQLITE_TARBALL_URL) | tar -xzf - -C deps/$(SQLITE_VERSION)/ --strip-components=1
 
-better-trigram$(EXT): better-trigram.c
-	$(CC) $(CFLAGS) $(CONDITIONAL_CFLAGS) -g -shared -fPIC -o $@ $<
+$(SQLITE_AMALGAMATION_PATH):
+	@echo Downloading SQLite amalgamation...
+	wget -q $(SQLITE_AMALGAMATION_URL) -O sqlite.zip
+	@echo Extracting SQLite amalgamation...
+	unzip sqlite.zip -d deps/
+	rm -f sqlite.zip
+
+better-trigram$(EXT): $(SQLITE_SRC) $(SQLITE_AMALGAMATION_PATH)
+	$(CC) $(CFLAGS) $(CONDITIONAL_CFLAGS) -shared -fPIC -o $@ better-trigram.c
 
 fts5$(EXT): SHELL := /bin/bash -e
-fts5$(EXT): $(SQLITE_SRC)/sqlite3ext.h
+fts5$(EXT): $(SQLITE_SRC) $(SQLITE_AMALGAMATION_PATH)
 	dir=deps/$(SQLITE_VERSION) \
 	cwd=$$(pwd); \
 	lemon $$dir/ext/fts5/fts5parse.y; \
 	cd $$dir/ext/fts5; \
 	tclsh $$cwd/$$dir/ext/fts5/tool/mkfts5c.tcl; \
 	cd $$cwd; \
-	$(CC) $(CONDITIONAL_CFLAGS) -DSQLITE_TEST -g -shared -fPIC $$dir/ext/fts5/fts5.c -o $@; \
+	$(CC) $(CFLAGS) $(CONDITIONAL_CFLAGS) -DSQLITE_TEST -shared -fPIC -o $@ $$dir/ext/fts5/fts5.c; \
 
 test: fts5$(EXT) better-trigram$(EXT)
 	bun test
