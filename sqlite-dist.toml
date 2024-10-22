@@ -1,0 +1,14 @@
+[package]
+name = "sqlite-better-trigram"
+license = "Public Domain"
+homepage = "https://github.com/streetwriters/sqlite-better-trigram"
+repo = "https://github.com/streetwriters/sqlite-better-trigram"
+description = "A (better) trigram tokenizer for SQLite3 FTS5"
+authors = ["Abdullah Atta"]
+git_tag_format = "v$VERSION"
+
+[targets]
+github_releases = {}
+amalgamation = {include=["better-trigram.c", "better-trigram.h"]}
+
+npm = {}

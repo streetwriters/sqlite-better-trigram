@@ -23,7 +23,7 @@ $(prefix):
 TARGET_LOADABLE=$(prefix)/better-trigram$(EXT)
 TARGET_FTS5=$(prefix)/fts5$(EXT)
 
-all: better-trigram$(EXT)
+all: $(TARGET_LOADABLE)
 
 clean:
 	rm -rf deps
