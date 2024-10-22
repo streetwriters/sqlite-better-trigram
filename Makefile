@@ -9,13 +9,9 @@ SQLITE_AMALGAMATION_PATH = deps/sqlite-amalgamation-3460100
 CFLAGS ?= -Ideps/$(SQLITE_VERSION)/ext/fts5 -I$(SQLITE_AMALGAMATION_PATH) -Os -Wall -Wextra
 CONDITIONAL_CFLAGS = -lm
 
-ifeq ($(OS),Windows_NT)
-	EXT = .dll
-else
-	UNAME_S := $(shell uname -s)
-	ifeq ($(UNAME_S),Darwin)
-		EXT = .dylib
-	endif
+UNAME_S := $(shell uname -s)
+ifeq ($(UNAME_S),Darwin)
+	EXT = .dylib
 endif
 
 .PHONY: all clean test

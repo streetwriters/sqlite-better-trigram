@@ -1,38 +1,36 @@
-!IF "$(OS)" == "Windows_NT"
 EXT = .dll
-!ELSE
-EXT = .so
-!ENDIF
-
-SQLITE_AMALGAMATION_PATH = deps\sqlite-amalgamation-3460100
 SQLITE_VERSION = version-3.46.1
-CFLAGS = -I$(SQLITE_AMALGAMATION_PATH) -Ideps\$(SQLITE_VERSION)\src -Ideps\$(SQLITE_VERSION)\ext\fts5 -Os -Wall
 
 SQLITE_TARBALL_URL = https://www.sqlite.org/src/tarball/sqlite.tar.gz?r=$(SQLITE_VERSION)
-SQLITE_AMALGAMATION_URL = https://sqlite.org/2024/sqlite-amalgamation-3460100.zip
 SQLITE_SRC = deps\$(SQLITE_VERSION)\src
+SQLITE_AMALGAMATION_URL = https://sqlite.org/2024/sqlite-amalgamation-3460100.zip
+SQLITE_AMALGAMATION_PATH = deps/sqlite-amalgamation-3460100
 
 TCL_DOWNLOAD_URL = https://www.irontcl.com/downloads/irontcl-amd64-8.6.7.zip
 TCLSH_PATH = deps\IronTcl\bin\tclsh86t.exe
 
-all: better-trigram$(EXT)
+CFLAGS = -I$(SQLITE_AMALGAMATION_PATH) -Ideps\$(SQLITE_VERSION)\src -Ideps\$(SQLITE_VERSION)\ext\fts5 -Os -Wall
+
+prefix=dist
+$(prefix):
+	if not exist $(prefix) mkdir $(prefix)
+
+TARGET_LOADABLE=$(prefix)\better-trigram$(EXT)
+TARGET_FTS5=$(prefix)\fts5$(EXT)
+TARGET_LEMON=$(prefix)\lemon.exe
+
+all: $(TARGET_LOADABLE)
 
 clean:
     if exist deps rmdir /S /Q deps
-    if exist fts5.dll del fts5.*
-    if exist lemon.exe del lemon.*
-    if exist lempar.c del lempar.*
-    if exist better-trigram.dll del better-trigram.dll
-    if exist better-trigram.exe del better-trigram.exe
-    if exist better-trigram.obj del better-trigram.obj
-    if exist better-trigram.exp del better-trigram.exp
-    if exist better-trigram.lib del better-trigram.lib
+    if exist $(prefix) rmdir /S /Q $(prefix)
+    if exist *.obj del *.obj
 
-$(SQLITE_SRC)\sqlite3ext.h:
+$(SQLITE_SRC):
     if not exist deps\$(SQLITE_VERSION) git clone --depth=1 --branch=$(SQLITE_VERSION) https://github.com/sqlite/sqlite.git deps\$(SQLITE_VERSION)
     REM curl -LsS $(SQLITE_TARBALL_URL) | tar -xzf - -C deps\$(SQLITE_VERSION)\ --strip-components=1
 
-$(SQLITE_AMALGAMATION_PATH)\sqlite3.h:
+$(SQLITE_AMALGAMATION_PATH):
     @echo Downloading SQLite amalgamation...
     powershell -Command "iwr -Uri $(SQLITE_AMALGAMATION_URL) -OutFile sqlite.zip"
     @echo Extracting SQLite amalgamation...
@@ -46,18 +44,18 @@ $(TCLSH_PATH):
     powershell -Command "Expand-Archive -Path tcl.zip -DestinationPath deps/"
     del tcl.zip
 
-better-trigram$(EXT): $(SQLITE_AMALGAMATION_PATH)\sqlite3.h $(SQLITE_SRC)\sqlite3ext.h
+$(TARGET_LOADABLE): $(SQLITE_AMALGAMATION_PATH) $(SQLITE_SRC) $(prefix)
     cl $(CFLAGS) /LD /Fe$@ better-trigram.c
 
-lemon.exe: $(SQLITE_SRC)\sqlite3ext.h
+$(TARGET_LEMON): $(SQLITE_SRC) $(prefix)
     cl deps\$(SQLITE_VERSION)\tool\lemon.c /Fe$@
-    copy deps\$(SQLITE_VERSION)\tool\lempar.c .\lempar.c
+    copy deps\$(SQLITE_VERSION)\tool\lempar.c $(prefix)\lempar.c
 
-fts5$(EXT): lemon.exe $(TCLSH_PATH) $(SQLITE_SRC)\sqlite3ext.h $(SQLITE_AMALGAMATION_PATH)\sqlite3.h
-    lemon.exe deps\$(SQLITE_VERSION)\ext\fts5\fts5parse.y
+$(TARGET_FTS5): $(TARGET_LEMON) $(TCLSH_PATH) $(SQLITE_SRC) $(SQLITE_AMALGAMATION_PATH) $(prefix)
+    $(TARGET_LEMON) deps\$(SQLITE_VERSION)\ext\fts5\fts5parse.y
     
     powershell -Command "$$CWD = pwd; cd deps\$(SQLITE_VERSION)\ext\fts5; & $$CWD\$(TCLSH_PATH) $$CWD\deps\$(SQLITE_VERSION)\ext\fts5\tool\mkfts5c.tcl"
-    cl /DSQLITE_TEST -I$(SQLITE_AMALGAMATION_PATH) /LD /Fefts5$(EXT) deps\$(SQLITE_VERSION)\ext\fts5\fts5.c
+    cl /DSQLITE_TEST -I$(SQLITE_AMALGAMATION_PATH) /LD /Fe$(TARGET_FTS5) deps\$(SQLITE_VERSION)\ext\fts5\fts5.c
 
-test: fts5$(EXT) better-trigram$(EXT)
+test: $(TARGET_FTS5) $(TARGET_LOADABLE)
     bun test
