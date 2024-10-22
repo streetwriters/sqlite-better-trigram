@@ -26,8 +26,8 @@ if (process.platform === "darwin" && process.env.SQLITE_LIB_PATH)
 
 function initDatabase() {
   const db = new Database(":memory:");
-  db.loadExtension(`./fts5${EXT}`);
-  db.loadExtension(`./better-trigram${EXT}`);
+  db.loadExtension(`./dist/fts5${EXT}`);
+  db.loadExtension(`./dist/better-trigram${EXT}`);
   return db;
 }
 

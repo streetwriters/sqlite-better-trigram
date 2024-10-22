@@ -7,3 +7,4 @@ cache/
 *.lib
 *.exe
 lempar.c
+dist/

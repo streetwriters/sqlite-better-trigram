@@ -15,19 +15,23 @@ else
 	UNAME_S := $(shell uname -s)
 	ifeq ($(UNAME_S),Darwin)
 		EXT = .dylib
-		CONDITIONAL_CFLAGS = -lsqlite3
 	endif
 endif
 
 .PHONY: all clean test
 
+prefix=dist
+$(prefix):
+	mkdir -p $(prefix)
+
+TARGET_LOADABLE=$(prefix)/better-trigram$(EXT)
+TARGET_FTS5=$(prefix)/fts5$(EXT)
+
 all: better-trigram$(EXT)
 
 clean:
 	rm -rf deps
-	rm -f better-trigram$(EXT)
-	rm -rf better-trigram$(EXT).dSYM
-	rm -rf fts5$(EXT)
+	rm -rf $(prefix)
 
 $(SQLITE_SRC):
 	mkdir -p deps/$(SQLITE_VERSION)
@@ -40,11 +44,10 @@ $(SQLITE_AMALGAMATION_PATH):
 	unzip sqlite.zip -d deps/
 	rm -f sqlite.zip
 
-better-trigram$(EXT): $(SQLITE_SRC) $(SQLITE_AMALGAMATION_PATH)
+$(TARGET_LOADABLE): $(SQLITE_SRC) $(SQLITE_AMALGAMATION_PATH) $(prefix)
 	$(CC) $(CFLAGS) $(CONDITIONAL_CFLAGS) -shared -fPIC -o $@ better-trigram.c
 
-fts5$(EXT): SHELL := /bin/bash -e
-fts5$(EXT): $(SQLITE_SRC) $(SQLITE_AMALGAMATION_PATH)
+$(TARGET_FTS5): $(SQLITE_SRC) $(SQLITE_AMALGAMATION_PATH) $(prefix)
 	dir=deps/$(SQLITE_VERSION) \
 	cwd=$$(pwd); \
 	lemon $$dir/ext/fts5/fts5parse.y; \
@@ -53,5 +56,5 @@ fts5$(EXT): $(SQLITE_SRC) $(SQLITE_AMALGAMATION_PATH)
 	cd $$cwd; \
 	$(CC) $(CFLAGS) $(CONDITIONAL_CFLAGS) -DSQLITE_TEST -shared -fPIC -o $@ $$dir/ext/fts5/fts5.c; \
 
-test: fts5$(EXT) better-trigram$(EXT)
+test: $(TARGET_FTS5) $(TARGET_LOADABLE)
 	bun test
