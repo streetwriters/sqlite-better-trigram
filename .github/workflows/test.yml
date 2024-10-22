@@ -64,6 +64,5 @@ jobs:
 
       - name: Run tests
         run: |
-          ls /opt/homebrew/Cellar/sqlite@3.46.1/3.46.1/lib/
-          export SQLITE_LIB_PATH=/opt/homebrew/Cellar/sqlite@3.46.1/3.46.1/lib/libsqlite.dylib
+          export SQLITE_LIB_PATH=/opt/homebrew/Cellar/sqlite@3.46.1/3.46.1/lib/libsqlite3.dylib
           make test
