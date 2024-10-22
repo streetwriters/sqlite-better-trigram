@@ -191,7 +191,7 @@ jobs:
             | tar xfJ - --strip-components 1
       - run: ./sqlite-dist ./sqlite-dist.toml --input dist/ --output distx/ --version $(cat VERSION)
       - run: |
-          gh release upload ${{ github.ref_name }} \
+          gh release upload --clobber ${{ github.ref_name }} \
             distx/amalgamation/* \
             distx/github_releases/* \
             distx/checksums.txt \
