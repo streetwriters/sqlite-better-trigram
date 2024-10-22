@@ -54,9 +54,13 @@ jobs:
         run: |
           brew install lemon
           brew install tcl-tk
+          brew install sqlite
 
       - name: Install bun
         uses: oven-sh/setup-bun@v2
 
       - name: Run tests
-        run: make test
+        run: |
+          SQLITE_DIR=$(dirname $(which sqlite))
+          export SQLITE_LIB_PATH=$SQLITE_DIR/libsqlite.dylib
+          make test
