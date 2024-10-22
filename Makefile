@@ -6,7 +6,7 @@ SQLITE_SRC = deps/$(SQLITE_VERSION)/src
 SQLITE_AMALGAMATION_URL = https://sqlite.org/2024/sqlite-amalgamation-3460100.zip
 SQLITE_AMALGAMATION_PATH = deps/sqlite-amalgamation-3460100
 
-CFLAGS ?= -Ideps/$(SQLITE_VERSION)/ext/fts5 -I$(SQLITE_AMALGAMATION_PATH) -Os -Wall -Wextra
+CFLAGS += -Ideps/$(SQLITE_VERSION)/ext/fts5 -I$(SQLITE_AMALGAMATION_PATH) -Os -Wall -Wextra
 CONDITIONAL_CFLAGS = -lm
 
 UNAME_S := $(shell uname -s)
