@@ -22,7 +22,7 @@ jobs:
       - uses: korandoru/setup-zig@v1
         with:
           zig-version: 0.13.0 # released versions or master
-      - run: make loadable
+      - run: make CC="zig cc -target aarch64-linux-gnu" loadable
       - uses: actions/upload-artifact@v4
         with:
           name: sqlite-better-trigram-linux-arm64-extension
