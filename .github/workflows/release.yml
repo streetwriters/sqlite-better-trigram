@@ -15,7 +15,7 @@ jobs:
         with:
           name: sqlite-better-trigram-linux-x86_64-extension
           path: dist/*
-  build-linux-arm64-extension:
+  build-linux-aarch64-extension:
     runs-on: ubuntu-20.04
     steps:
       - uses: actions/checkout@v4
@@ -25,7 +25,7 @@ jobs:
       - run: make CC="zig cc -target aarch64-linux-gnu" loadable
       - uses: actions/upload-artifact@v4
         with:
-          name: sqlite-better-trigram-linux-arm64-extension
+          name: sqlite-better-trigram-linux-aarch64-extension
           path: dist/*
   build-macos-x86_64-extension:
     runs-on: macos-12
@@ -57,7 +57,7 @@ jobs:
         with:
           name: sqlite-better-trigram-windows-x86_64-extension
           path: dist/*
-  build-windows-arm64-extension:
+  build-windows-aarch64-extension:
     runs-on: windows-2019
     permissions:
       contents: write
@@ -69,7 +69,7 @@ jobs:
       - run: nmake /f Makefile.vc loadable
       - uses: actions/upload-artifact@v4
         with:
-          name: sqlite-better-trigram-windows-arm64-extension
+          name: sqlite-better-trigram-windows-aarch64-extension
           path: dist/*
   build-android-extensions:
     runs-on: ubuntu-latest
@@ -153,11 +153,11 @@ jobs:
     needs:
       [
         build-linux-x86_64-extension,
-        build-linux-arm64-extension,
+        build-linux-aarch64-extension,
         build-macos-x86_64-extension,
         build-macos-aarch64-extension,
         build-windows-x86_64-extension,
-        build-windows-arm64-extension,
+        build-windows-aarch64-extension,
         build-android-extensions,
         build-ios-extensions,
       ]
@@ -172,8 +172,8 @@ jobs:
           path: dist/linux-x86_64
       - uses: actions/download-artifact@v4
         with:
-          name: sqlite-better-trigram-linux-arm64-extension
-          path: dist/linux-arm64
+          name: sqlite-better-trigram-linux-aarch64-extension
+          path: dist/linux-aarch64
       - uses: actions/download-artifact@v4
         with:
           name: sqlite-better-trigram-macos-x86_64-extension
@@ -188,8 +188,8 @@ jobs:
           path: dist/windows-x86_64
       - uses: actions/download-artifact@v4
         with:
-          name: sqlite-better-trigram-windows-arm64-extension
-          path: dist/windows-arm64
+          name: sqlite-better-trigram-windows-aarch64-extension
+          path: dist/windows-aarch64
       - uses: actions/download-artifact@v4
         with:
           name: sqlite-better-trigram-android-aarch64-extension
@@ -244,7 +244,9 @@ jobs:
           npm publish --access public distx/npm/sqlite-better-trigram-darwin-arm64.tar.gz
           npm publish --access public distx/npm/sqlite-better-trigram-darwin-x64.tar.gz
           npm publish --access public distx/npm/sqlite-better-trigram-linux-x64.tar.gz
+          npm publish --access public distx/npm/sqlite-better-trigram-linux-arm64.tar.gz
           npm publish --access public distx/npm/sqlite-better-trigram-windows-x64.tar.gz
+          npm publish --access public distx/npm/sqlite-better-trigram-windows-arm64.tar.gz
           npm publish --access public distx/npm/sqlite-better-trigram.tar.gz
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
