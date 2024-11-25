@@ -6,6 +6,8 @@ While SQLite3 already has a built-in trigram tokenizer, it does not have any kin
 
 This tokenizer fixes this by treating spaces as a word boundary. The result is that `i am a bird` gets tokenized as `['i', 'am', 'a', 'bir', 'ird']` and `SELECT * FROM fts_table WHERE title MATCH 'a bird'` correctly returns the expected results. You get all the benefits for substring matching just with a wider range of queries.
 
+Furthermore, the built-in `trigram` tokenizer treats CJK as normal characters and creates trigrams out of them. The problem is, in CJK a single Unicode character can be a whole word. `better-trigram` fixes this by treating each CJK character as its own token. For example: `李红：那是钢笔` gets tokenized as `['李','红','：','那','是','钢','笔']` and if there are any non-CJK words mixed in the input, they also get properly tokenized automatically.
+
 ## Compatibility with `trigram`
 
 `better-trigram` is 99% compatible with `trigram`. This means it has full UTF-8 support, handles all the same edge cases etc. To ensure `better-trigram` remains compatible, it passes all the `trigram` tokenizer tests. Yay!
