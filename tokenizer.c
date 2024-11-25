@@ -74,6 +74,31 @@ static const unsigned char sqlite3Utf8Trans1[] = {
     }                                                                          \
   }
 
+static const int CJK[6][2] = {{0x3400, 0x4DBF},   {0x4E00, 0x9FFF},
+                              {0xF900, 0xFAFF},   {0x20000, 0x2EBEF},
+                              {0x2F800, 0x2FA1F}, {0x30000, 0x3134F}};
+// https://jrgraphix.net/research/unicode_blocks.php
+// https://en.wikipedia.org/wiki/CJK_Unified_Ideographs
+// 3400 — 4DBF  	CJK Unified Ideographs Extension A
+// 4E00 — 9FFF  	CJK Unified Ideographs
+// F900 — FAFF  	CJK Compatibility Ideographs
+// 20000 — 2A6DF 2A700-2B73F 2B740–2B81F. 2B820–2CEAF. 2CEB0–2EBEF.	CJK
+// Unified Ideographs Extension B/C/D/E/F 2F800 — 2FA1F  	CJK
+// Compatibility Ideographs Supplement
+//   30000–3134F. CJK Unified Ideographs Extension G
+static inline int isCJK(int iCode) {
+  for (int i = 0; i < 6; i++) {
+    if (iCode < CJK[i][0]) { // smaller
+      break;
+    }
+    if (iCode <= CJK[i][1]) { // in range
+      return 1;
+    }
+    // bigger than range
+  }
+  return 0;
+}
+
 /* Function to optionally fold case and remove diacritics */
 static inline int customFold(int iCode, int foldCase, int removeDiacritics) {
   if (iCode == 0)
@@ -130,11 +155,23 @@ static void tokenize(const char *pText, int nText, int foldCase,
       isPartial = 1;
     }
 
-    if (iCode == 32) {
+    int cjk = isCJK(iCode);
+    int isSpace = iCode == 32;
+    if (isSpace || cjk) {
       // write words smaller than 3 characters directly to output
       // but make sure we aren't at the end of a word
       if (!isPartial && i && i < 3) {
         int result = xToken(pCtx, 0, aBuf, zOut - aBuf, aStart[0], start);
+        if (result != 0)
+          break;
+      }
+
+      if (cjk) {
+        zOut = aBuf;
+        WRITE_UTF8(zOut, iCode);
+
+        int result =
+            xToken(pCtx, 0, aBuf, zOut - aBuf, start, start + (zOut - aBuf));
         if (result != 0)
           break;
       }

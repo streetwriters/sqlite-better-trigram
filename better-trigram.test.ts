@@ -759,6 +759,70 @@ describe("case_sensitive", () => {
   });
 });
 
+describe("cjk", () => {
+  const db = initDatabase();
+  afterAll(() => db.close());
+
+  test("1.0", () => {
+    [
+      `CREATE VIRTUAL TABLE t1 USING fts5(y, tokenize='better_trigram remove_diacritics 1');`,
+      `INSERT INTO t1 VALUES('王明：这是什么？');`,
+      `INSERT INTO t1 VALUES('李红：这是书。');`,
+      `INSERT INTO t1 VALUES('王明：那是什么？');`,
+      `INSERT INTO t1 VALUES('李红：那是钢笔。');`,
+      `INSERT INTO t1 VALUES('王明：那是杂志吗？');`,
+      `INSERT INTO t1 VALUES('李红：不，那不是杂志。那是字典。');`,
+      `INSERT INTO t1 VALUES('some 李红：不，那不 text 是杂志。in 那是 chinese 字典。');`,
+    ].forEach((stmt) => db.query(stmt).run());
+  });
+
+  sqlTest(
+    db,
+    `1.1`,
+    `SELECT highlight(t1, 0, '(', ')') as res FROM t1('王明');`,
+    [],
+    ["(王明)：这是什么？", "(王明)：那是什么？", "(王明)：那是杂志吗？"]
+  );
+
+  sqlTest(
+    db,
+    `1.2`,
+    `SELECT highlight(t1, 0, '(', ')') as res FROM t1('那是');`,
+    [],
+    [
+      "王明：(那是)什么？",
+      "李红：(那是)钢笔。",
+      "王明：(那是)杂志吗？",
+      "李红：不，那不是杂志。(那是)字典。",
+      "some 李红：不，那不 text 是杂志。in (那是) chinese 字典。",
+    ]
+  );
+
+  sqlTest(
+    db,
+    `1.3`,
+    `SELECT highlight(t1, 0, '(', ')') as res FROM t1('钢');`,
+    [],
+    ["李红：那是(钢)笔。"]
+  );
+
+  sqlTest(
+    db,
+    `1.4`,
+    `SELECT highlight(t1, 0, '(', ')') as res FROM t1('王明：');`,
+    [],
+    ["(王明：)这是什么？", "(王明：)那是什么？", "(王明：)那是杂志吗？"]
+  );
+
+  sqlTest(
+    db,
+    `1.4`,
+    `SELECT highlight(t1, 0, '(', ')') as res FROM t1('some 李红');`,
+    [],
+    ["(some) (李红)：不，那不 text 是杂志。in 那是 chinese 字典。"]
+  );
+});
+
 function sqlTest(
   db: Database,
   version: string,
