@@ -16,7 +16,7 @@ const lorem = new LoremIpsum({
 const text = lorem.generateParagraphs(100);
 function initDatabase() {
   const db = new Database(":memory:");
-  db.loadExtension("./better-trigram.so");
+  db.loadExtension("./dist/better-trigram.so");
   return db;
 }
 const db = initDatabase();
