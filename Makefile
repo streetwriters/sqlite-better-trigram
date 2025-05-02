@@ -1,10 +1,10 @@
 EXT = .so
-SQLITE_VERSION ?= version-3.46.1
+SQLITE_VERSION ?= version-3.49.1
 
 SQLITE_TARBALL_URL = https://www.sqlite.org/src/tarball/sqlite.tar.gz?r=${SQLITE_VERSION}
 SQLITE_SRC = deps/$(SQLITE_VERSION)/src
-SQLITE_AMALGAMATION_URL = https://sqlite.org/2024/sqlite-amalgamation-3460100.zip
-SQLITE_AMALGAMATION_PATH = deps/sqlite-amalgamation-3460100
+SQLITE_AMALGAMATION_URL = https://sqlite.org/2025/sqlite-amalgamation-3490100.zip
+SQLITE_AMALGAMATION_PATH = deps/sqlite-amalgamation-3490100
 
 override CFLAGS += -Ideps/$(SQLITE_VERSION)/ext/fts5 -I$(SQLITE_AMALGAMATION_PATH) -Os -Wall -Wextra
 CONDITIONAL_CFLAGS = -lm

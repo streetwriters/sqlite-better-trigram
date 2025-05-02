@@ -1,10 +1,10 @@
 EXT = .dll
-SQLITE_VERSION = version-3.46.1
+SQLITE_VERSION = version-3.49.1
 
 SQLITE_TARBALL_URL = https://www.sqlite.org/src/tarball/sqlite.tar.gz?r=$(SQLITE_VERSION)
 SQLITE_SRC = deps\$(SQLITE_VERSION)\src
-SQLITE_AMALGAMATION_URL = https://sqlite.org/2024/sqlite-amalgamation-3460100.zip
-SQLITE_AMALGAMATION_PATH = deps/sqlite-amalgamation-3460100
+SQLITE_AMALGAMATION_URL = https://sqlite.org/2025/sqlite-amalgamation-3490100.zip
+SQLITE_AMALGAMATION_PATH = deps/sqlite-amalgamation-3490100
 
 TCL_DOWNLOAD_URL = https://www.irontcl.com/downloads/irontcl-amd64-8.6.7.zip
 TCLSH_PATH = deps\IronTcl\bin\tclsh86t.exe
@@ -54,7 +54,7 @@ $(TARGET_LEMON): $(SQLITE_SRC) $(prefix)
 
 $(TARGET_FTS5): $(TARGET_LEMON) $(TCLSH_PATH) $(SQLITE_SRC) $(SQLITE_AMALGAMATION_PATH) $(prefix)
     $(TARGET_LEMON) deps\$(SQLITE_VERSION)\ext\fts5\fts5parse.y
-    
+
     powershell -Command "$$CWD = pwd; cd deps\$(SQLITE_VERSION)\ext\fts5; & $$CWD\$(TCLSH_PATH) $$CWD\deps\$(SQLITE_VERSION)\ext\fts5\tool\mkfts5c.tcl"
     cl /DSQLITE_TEST -I$(SQLITE_AMALGAMATION_PATH) /LD /Fe$(TARGET_FTS5) deps\$(SQLITE_VERSION)\ext\fts5\fts5.c
 
