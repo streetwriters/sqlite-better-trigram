@@ -19,7 +19,7 @@ With that being said, `better-trigram` doesn't support `LIKE` & `GLOB` patterns.
 You can use this tokenizer like any other custom tokenizer:
 
 ```sh
-make
+make loadable
 ```
 
 Load the `better-trigram.so` file as a loadable SQLite extension (e.g. `.load better-trigram.so`).
