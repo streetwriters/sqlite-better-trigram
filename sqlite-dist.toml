@@ -9,6 +9,6 @@ git_tag_format = "v$VERSION"
 
 [targets]
 github_releases = {}
-amalgamation = {include=["better-trigram.c", "better-trigram.h"]}
+amalgamation = {include=["better-trigram.c", "better-trigram.h", "tokenizer.c"]}
 
 npm = {}
