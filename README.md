@@ -14,15 +14,33 @@ Furthermore, the built-in `trigram` tokenizer treats CJK as normal characters an
 
 With that being said, `better-trigram` doesn't support `LIKE` & `GLOB` patterns. This is a limitation in FTS5 because it doesn't allow custom tokenizers to opt-in to this behavior. (You _could_ technically compile a custom version of FTS5 that enables support for this but I haven't looked into it.) Using `LIKE` & `GLOB` will fallback to full table scans (not recommended).
 
-## Usage
+## Getting started
 
-You can use this tokenizer like any other custom tokenizer:
+### Prerequisites
+
+- Lemon
+- Tcl
+
+### Build
+
+First install the prerequisites:
+
+```sh
+# on macOS
+brew install lemon tcl-tk
+# on Ubuntu Linux
+sudo apt install lemon tcl
+```
+
+Then build the tokenizer:
 
 ```sh
 make loadable
 ```
 
-Load the `better-trigram.so` file as a loadable SQLite extension (e.g. `.load better-trigram.so`).
+### Usage
+
+Load the `better-trigram.so` or `better-trigram.dylib` file as a loadable SQLite extension (e.g. `.load better-trigram.so`).
 
 Then specify it when creating your FTS5 virtual table:
 
