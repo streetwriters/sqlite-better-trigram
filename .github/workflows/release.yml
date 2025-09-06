@@ -90,8 +90,8 @@ jobs:
           distribution: "temurin"
       - uses: android-actions/setup-android@v3
       - run: |
-          sdkmanager --install "ndk;27.0.12077973"
-          echo "ANDROID_NDK_HOME=$ANDROID_SDK_ROOT/ndk/27.0.12077973" >> $GITHUB_ENV
+          sdkmanager --install "ndk;28.2.13676358"
+          echo "ANDROID_NDK_HOME=$ANDROID_SDK_ROOT/ndk/28.2.13676358" >> $GITHUB_ENV
       - run: |
           ls $ANDROID_NDK_HOME/toolchains/llvm/prebuilt/
           ls $ANDROID_NDK_HOME/toolchains/llvm/prebuilt/linux-x86_64/bin
@@ -202,10 +202,6 @@ jobs:
         with:
           name: sqlite-better-trigram-android-x86_64-extension
           path: dist/android-x86_64
-      - uses: actions/download-artifact@v4
-        with:
-          name: sqlite-better-trigram-android-armv7a-extension
-          path: dist/android-armv7a
       - uses: actions/download-artifact@v4
         with:
           name: sqlite-better-trigram-android-armv7a-extension
