@@ -46,17 +46,17 @@ $(TCLSH_PATH):
     del tcl.zip
 
 $(TARGET_LOADABLE): $(SQLITE_AMALGAMATION_PATH) $(SQLITE_SRC) $(prefix)
-    cl $(CFLAGS) /LD /Fe$@ better-trigram.c
+    cl $(CFLAGS) /MT /LD /Fe$@ better-trigram.c
 
 $(TARGET_LEMON): $(SQLITE_SRC) $(prefix)
-    cl deps\$(SQLITE_VERSION)\tool\lemon.c /Fe$@
+    cl /MT deps\$(SQLITE_VERSION)\tool\lemon.c /Fe$@
     copy deps\$(SQLITE_VERSION)\tool\lempar.c $(prefix)\lempar.c
 
 $(TARGET_FTS5): $(TARGET_LEMON) $(TCLSH_PATH) $(SQLITE_SRC) $(SQLITE_AMALGAMATION_PATH) $(prefix)
     $(TARGET_LEMON) deps\$(SQLITE_VERSION)\ext\fts5\fts5parse.y
 
     powershell -Command "$$CWD = pwd; cd deps\$(SQLITE_VERSION)\ext\fts5; & $$CWD\$(TCLSH_PATH) $$CWD\deps\$(SQLITE_VERSION)\ext\fts5\tool\mkfts5c.tcl"
-    cl /DSQLITE_TEST -I$(SQLITE_AMALGAMATION_PATH) /LD /Fe$(TARGET_FTS5) deps\$(SQLITE_VERSION)\ext\fts5\fts5.c
+    cl /DSQLITE_TEST -I$(SQLITE_AMALGAMATION_PATH) /MT /LD /Fe$(TARGET_FTS5) deps\$(SQLITE_VERSION)\ext\fts5\fts5.c
 
 test: $(TARGET_FTS5) $(TARGET_LOADABLE)
     bun test
