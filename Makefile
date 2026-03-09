@@ -12,6 +12,8 @@ CONDITIONAL_CFLAGS = -lm
 UNAME_S := $(shell uname -s)
 ifeq ($(UNAME_S),Darwin)
 	EXT = .dylib
+	# handle macOS path re-linking
+	override CFLAGS += -Wl,-headerpad_max_install_names
 endif
 
 .PHONY: all clean test
