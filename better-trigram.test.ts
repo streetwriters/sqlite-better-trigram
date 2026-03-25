@@ -821,6 +821,79 @@ describe("cjk", () => {
     [],
     ["(some) (李红)：不，那不 text 是杂志。in 那是 chinese 字典。"]
   );
+
+  test("1.5 (Japanese Setup)", () => {
+    [
+      `INSERT INTO t1 VALUES('リンゴを食べます。');`,
+      `INSERT INTO t1 VALUES('半角ｶﾀｶﾅと、句読点。');`,
+      `INSERT INTO t1 VALUES('「こんにちは」と言った。');`,
+      `INSERT INTO t1 VALUES('ｆｕｌｌｗｉｄｔｈのテスト');`,
+      `INSERT INTO t1 VALUES('ﾊﾝｶｸのﾃｽﾄ');`,
+    ].forEach((stmt) => db.query(stmt).run());
+  });
+
+  // Full-width Katakana
+  sqlTest(
+    db,
+    `1.6`,
+    `SELECT highlight(t1, 0, '(', ')') as res FROM t1('リンゴ');`,
+    [],
+    ["(リンゴ)を食べます。"]
+  );
+
+  // Kanji + Hiragana (The exact issue your PR fixes)
+  sqlTest(
+    db,
+    `1.7`,
+    `SELECT highlight(t1, 0, '(', ')') as res FROM t1('食べ');`,
+    [],
+    ["リンゴを(食べ)ます。"]
+  );
+
+  // Half-width Katakana
+  sqlTest(
+    db,
+    `1.8`,
+    `SELECT highlight(t1, 0, '(', ')') as res FROM t1('ｶﾀｶﾅ');`,
+    [],
+    ["半角(ｶﾀｶﾅ)と、句読点。"]
+  );
+
+  // Japanese Punctuation (Comma / Ideographic Comma)
+  sqlTest(
+    db,
+    `1.9`,
+    `SELECT highlight(t1, 0, '(', ')') as res FROM t1('、');`,
+    [],
+    ["半角ｶﾀｶﾅと(、)句読点。"]
+  );
+
+  // Japanese Punctuation (Brackets) + Hiragana
+  sqlTest(
+    db,
+    `1.10`,
+    `SELECT highlight(t1, 0, '(', ')') as res FROM t1('「こんにちは」');`,
+    [],
+    ["(「こんにちは」)と言った。"]
+  );
+
+  // Full-width Romaji 
+  sqlTest(
+    db,
+    `1.12`,
+    `SELECT highlight(t1, 0, '(', ')') as res FROM t1('ｗｉｄｔｈ');`,
+    [],
+    ["ｆｕｌｌ(ｗｉｄｔｈ)のテスト"]
+  );
+
+  // Half-width Katakana
+  sqlTest(
+    db,
+    `1.13`,
+    `SELECT highlight(t1, 0, '(', ')') as res FROM t1('ﾝｶｸ');`,
+    [],
+    ["ﾊ(ﾝｶｸ)のﾃｽﾄ"]
+  );
 });
 
 function sqlTest(

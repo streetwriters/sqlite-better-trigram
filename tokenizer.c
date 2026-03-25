@@ -74,20 +74,30 @@ static const unsigned char sqlite3Utf8Trans1[] = {
     }                                                                          \
   }
 
-static const int CJK[6][2] = {{0x3400, 0x4DBF},   {0x4E00, 0x9FFF},
-                              {0xF900, 0xFAFF},   {0x20000, 0x2EBEF},
-                              {0x2F800, 0x2FA1F}, {0x30000, 0x3134F}};
+static const int CJK[8][2] = {
+    {0x3000, 0x30FF},   // CJK Symbols, Hiragana, Katakana
+    {0x3400, 0x4DBF},   // CJK Unified Ideographs Extension A
+    {0x4E00, 0x9FFF},   // CJK Unified Ideographs
+    {0xF900, 0xFAFF},   // CJK Compatibility Ideographs
+    {0xFF00, 0xFFEF},   // Halfwidth and Fullwidth Forms (incl. Halfwidth Katakana)
+    {0x20000, 0x2EBEF}, // CJK Unified Ideographs Extension B/C/D/E/F
+    {0x2F800, 0x2FA1F}, // CJK Compatibility Ideographs Supplement
+    {0x30000, 0x3134F}  // CJK Unified Ideographs Extension G
+};
+
 // https://jrgraphix.net/research/unicode_blocks.php
 // https://en.wikipedia.org/wiki/CJK_Unified_Ideographs
-// 3400 — 4DBF  	CJK Unified Ideographs Extension A
-// 4E00 — 9FFF  	CJK Unified Ideographs
-// F900 — FAFF  	CJK Compatibility Ideographs
-// 20000 — 2A6DF 2A700-2B73F 2B740–2B81F. 2B820–2CEAF. 2CEB0–2EBEF.	CJK
-// Unified Ideographs Extension B/C/D/E/F 2F800 — 2FA1F  	CJK
-// Compatibility Ideographs Supplement
-//   30000–3134F. CJK Unified Ideographs Extension G
+// 3000 — 30FF    CJK Symbols and Punctuation, Hiragana, Katakana
+// 3400 — 4DBF    CJK Unified Ideographs Extension A
+// 4E00 — 9FFF    CJK Unified Ideographs
+// F900 — FAFF    CJK Compatibility Ideographs
+// FF00 — FFEF    Halfwidth and Fullwidth Forms
+// 20000 — 2EBEF  CJK Unified Ideographs Extension B/C/D/E/F 
+// 2F800 — 2FA1F  CJK Compatibility Ideographs Supplement
+// 30000 — 3134F  CJK Unified Ideographs Extension G
+
 static inline int isCJK(int iCode) {
-  for (int i = 0; i < 6; i++) {
+  for (int i = 0; i < 8; i++) {
     if (iCode < CJK[i][0]) { // smaller
       break;
     }
